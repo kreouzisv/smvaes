@@ -1,7 +1,8 @@
 
 import tensorflow as tf
+import numpy as np
 
-def mlp_encoder(units,latent_dim):
+def mlp_encoder(units,data_dim,latent_dim):
     return tf.keras.Sequential(
       [
         tf.keras.layers.InputLayer(input_shape = data_dim),

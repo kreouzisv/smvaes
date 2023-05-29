@@ -16,8 +16,8 @@ warnings.filterwarnings('ignore')
 #from utils import discretized_mix_logistic_loss_ as discretized_mix_logistic_loss_
 
 #from adaptiveMALA import AdaptiveMALA
-from grad_adaptive_MALA import AdaptiveMALA
-from grad_adaptive_hmc import AdaptiveHMC
+from samplers.grad_adaptive_MALA import AdaptiveMALA
+from samplers.grad_adaptive_hmc import AdaptiveHMC
 
 from utils.utils import discretized_mix_logistic_loss, sample_from_discretized_mix_logistic
 

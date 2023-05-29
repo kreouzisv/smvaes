@@ -20,12 +20,12 @@ from absl import app
 from absl import flags
 import os
 import sys
-from VAE_model import VAE
+from models.VAE_model import VAE
 import pandas as pd
-from load_oasis import load_oasis
+#from load_oasis import load_oasis
 #from utils import discretized_mix_logistic_loss
 #from utils import sample_from_discretized_mix_logistic
-from flow_based_generative_model import Flow_Generator
+#from flow_based_generative_model import Flow_Generator
 from utils.utils import make_bijector_kwargs
 from utils.utils import sample_from_discretized_mix_logistic
 from utils.utils import resnet50_encoder
@@ -34,9 +34,9 @@ import seaborn as sns
 from utils.utils import KID_score
 from utils.utils import preprocess_binary_images, preprocess_images
 from utils.utils import preprocess_images_logistic_mixture
-from load_reduced_dataset import load_reduced_dataset
+#from load_reduced_dataset import load_reduced_dataset
 from sklearn.model_selection import train_test_split
-from load_celebA import load_celebA
+#from load_celebA import load_celebA
 
 tfd = tfp.distributions
 tfb = tfp.bijectors
@@ -110,7 +110,7 @@ flags.DEFINE_integer("reduced_sample",
 
 flags.DEFINE_string(
     'model_dir',
-    default=os.path.join(os.getcwd(),'VAE_kid_test'),
+    default=os.path.join(os.getcwd(),'VAE'),
     help="Directory to put the model's fit and outputs.")
 flags.DEFINE_string(
     'data_set',
@@ -225,8 +225,8 @@ def main(argv):
 
   if FLAGS.netw == 'mlp':
 
-    encoder = mlp_encoder(units=200,latent_dim=latent_dim)
-    decoder = mlp_decoder(units=200,data_dim=data_dim)
+    encoder = mlp_encoder(units=200,data_dim= data_dim,latent_dim=latent_dim)
+    decoder = mlp_decoder(units=200,data_dim=data_dim,latent_dim=latent_dim)
 
   if FLAGS.netw == 'cnn':
     encoder = cnn_encoder(data_dim=data_dim,latent_dim=latent_dim)

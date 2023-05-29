@@ -10,7 +10,7 @@ from tensorflow_probability.python.internal import dtype_util
 from tensorflow_probability.python.mcmc import metropolis_hastings
 from tensorflow_probability.python.mcmc import hmc
 
-import leapfrog_integrator_trajectory as leapfrog_impl
+import samplers.leapfrog_integrator_trajectory as leapfrog_impl
 from tensorflow_probability.python.util.seed_stream import SeedStream
 from tensorflow_probability.python.random import rademacher
 from tensorflow_probability.python.distributions import Geometric, Normal
