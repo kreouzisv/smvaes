@@ -6,6 +6,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from nnets.encoders import mlp_encoder,cnn_encoder
+from nnets.decoders import mlp_decoder,cnn_decoder
+
 
 import tensorflow as tf
 #tf.config.list_physical_devices('GPU')
@@ -221,153 +224,13 @@ def main(argv):
   latent_dim = FLAGS.latent_dim
 
   if FLAGS.netw == 'mlp':
-    encoder = tf.keras.Sequential(
-      [
-        tf.keras.layers.InputLayer(input_shape = data_dim),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(400, activation = "relu"),
-        tf.keras.layers.Dense(400, activation = "relu"),
-        # No activation
-        tf.keras.layers.Dense(latent_dim + latent_dim),
-      ]
-    )
 
-
-    decoder = tf.keras.Sequential(
-      [
-        tf.keras.layers.InputLayer(input_shape = (latent_dim,)),
-        tf.keras.layers.Dense(400, activation = "relu"),
-        tf.keras.layers.Dense(400, activation = "relu"),
-        tf.keras.layers.Dense(np.prod(data_dim)),
-        tf.keras.layers.Reshape((data_dim[0],data_dim[1],data_dim[2]))
-      ]
-    )
-  if FLAGS.netw == 'cnn_':
-
-    # encoder = tf.keras.Sequential([
-    # tf.keras.layers.InputLayer(input_shape = data_dim),
-    # tf.keras.layers.Conv2D(filters=64 , kernel_size=4, strides=2, activation=tf.nn.relu, padding='same'),
-    # tf.keras.layers.Conv2D(filters=128, kernel_size=4, strides=2, activation=tf.nn.relu, padding='same'),
-    # tf.keras.layers.Conv2D(filters=512, kernel_size=4, strides=2, activation=tf.nn.relu, padding='same'),
-    # tf.keras.layers.Flatten(),
-    # tf.keras.layers.Dense(latent_dim + latent_dim)
-    # ])
-
-    # decoder = tf.keras.Sequential([
-    # tf.keras.layers.InputLayer(input_shape = (latent_dim,)),
-    # tf.keras.layers.Dense(2048),
-    # tf.keras.layers.Reshape(target_shape=(4, 4, 128), input_shape=(None, 1024)),
-    # tf.keras.layers.Conv2DTranspose(filters=256, kernel_size=4, strides=2, activation=tf.nn.relu, padding='same'),
-    # tf.keras.layers.Conv2DTranspose(filters=64 , kernel_size=4, strides=2, activation=tf.nn.relu, padding='same'),
-    # tf.keras.layers.Conv2DTranspose(filters=1, kernel_size=4, strides=2, activation='linear', padding='same')
-    # ])
-
-    encoder = tf.keras.Sequential(
-        [
-            tf.keras.layers.InputLayer(input_shape=(28, 28, 1)),
-            tf.keras.layers.Conv2D(
-                filters=32, kernel_size=3, strides=(2, 2), activation='relu'),
-            tf.keras.layers.Conv2D(
-                filters=64, kernel_size=3, strides=(2, 2), activation='relu'),
-            tf.keras.layers.Flatten(),
-            # No activation
-            tf.keras.layers.Dense(latent_dim + latent_dim),
-        ]
-    )
-
-    decoder = tf.keras.Sequential(
-        [
-            tf.keras.layers.InputLayer(input_shape=(latent_dim,)),
-            tf.keras.layers.Dense(units=7*7*128, activation=tf.nn.relu),
-            tf.keras.layers.Reshape(target_shape=(7, 7, 128)),
-            tf.keras.layers.Conv2DTranspose(
-                filters=64, kernel_size=3, strides=2, padding='same',
-                activation='relu'),
-            tf.keras.layers.Conv2DTranspose(
-                filters=32, kernel_size=3, strides=2, padding='same',
-                activation='relu'),
-            # No activation
-            tf.keras.layers.Conv2DTranspose(
-                filters=1, kernel_size=3, strides=1, padding='same'),
-        ]
-    )
-
-
+    encoder = mlp_encoder(units=200,latent_dim=latent_dim)
+    decoder = mlp_decoder(units=200,data_dim=data_dim)
 
   if FLAGS.netw == 'cnn':
-
-    encoder = tf.keras.Sequential(
-      [ 
-        
-        tf.keras.layers.InputLayer(input_shape = data_dim),
-        tf.keras.layers.Conv2D(filters = 128, kernel_size = (4, 4),strides = 2,padding='same'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('relu'),
-        tf.keras.layers.Conv2D(filters = 256, kernel_size = (4, 4),strides = 2,padding='same'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('relu'),
-        tf.keras.layers.Conv2D(filters = 512, kernel_size = (4, 4),strides = 2,padding='same'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('relu'),
-        tf.keras.layers.Conv2D(filters = 1024, kernel_size = (4, 4),strides = 2,padding='same'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('relu'),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(latent_dim + latent_dim),
-      ]
-    )
-
-
-    decoder = tf.keras.Sequential(
-      [
-        tf.keras.layers.InputLayer(input_shape = (latent_dim,)),
-        tf.keras.layers.Dense(units = data_dim[0]//8 * data_dim[1]//8 * 1024, activation = 'linear'),
-        tf.keras.layers.Reshape(target_shape = (data_dim[0]//8, data_dim[1]//8, 1024)),
-        tf.keras.layers.Conv2DTranspose(filters = 512, kernel_size = (4, 4), strides = 2,padding='same'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('relu'),
-        tf.keras.layers.Conv2DTranspose(filters = 256, kernel_size = (4, 4), strides = 2,padding='same'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('relu'),
-        tf.keras.layers.Conv2DTranspose(filters = 128, kernel_size = (4, 4), strides = 2,padding='same'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('relu'),
-        tf.keras.layers.Conv2DTranspose(filters = 100, kernel_size =  (4, 4), strides = 1,padding='same'),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('linear')
-
-
-      ])
-
-
-
-
-
-
-
-
-
-  if FLAGS.netw == 'resnet':
-
-    encoder = resnet50_encoder(input_shape =data_dim,latent_dim = FLAGS.latent_dim)
-    decoder = tf.keras.Sequential(
-      [
-        tf.keras.layers.InputLayer(input_shape = (latent_dim,)),
-        tf.keras.layers.Dense(units = data_dim[0]//8 * data_dim[1]//8 * 256, activation = 'linear'),
-        tf.keras.layers.Reshape(target_shape = (data_dim[0]//8, data_dim[1]//8, 256)),
-        tf.keras.layers.Conv2DTranspose(filters = 256, kernel_size = (3, 3), strides = 2),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('relu'),
-        tf.keras.layers.Conv2DTranspose(filters = 256, kernel_size = (3, 3), strides = 2),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('relu'),
-        tf.keras.layers.Conv2DTranspose(filters = 3, kernel_size =  (3, 3), strides = 1),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation('linear')
-
-
-      ])
-
+    encoder = cnn_encoder(data_dim=data_dim,latent_dim=latent_dim)
+    decoder = cnn_decoder(latent_dim=latent_dim)
 
   #######
   #Diagonal or full cholesky matrix for preconditioning
@@ -397,9 +260,6 @@ def main(argv):
 
   else:
 
-  
-
-  
     class ConstantLayer(tf.keras.layers.Layer):
       def __init__(self):
         super(ConstantLayer, self).__init__()
