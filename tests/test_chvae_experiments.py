@@ -68,11 +68,11 @@ flags.DEFINE_bool("train_prior",
 
 flags.DEFINE_string(
     'model_dir',
-    default=os.path.join(os.getcwd(),'simulation rebutals'),
+    default=os.path.join(os.getcwd(),'simulation'),
     help="Directory to put the model's fit and outputs.")
 flags.DEFINE_string(
     'data',
-    default='simulation_',
+    default='simulation',
     help="data (small_mnist, simulation, omniglot).")
 flags.DEFINE_bool(
     'diagonal_pre_cond',
@@ -120,54 +120,6 @@ if True:
   latent_dims = FLAGS.latent_dims
 
   if FLAGS.data == 'simulation':
-    data_dim = 10
-    train_size = 1000
-    sigma_data = .5
-    sigma_z = tf.ones([len(latent_dims)])#1./tf.range(1,1+len(latent_dims), dtype=tf.float32)
-    W_L = tf.random.normal([data_dim, latent_dims[-1]])
-    As = []
-    W = []
-    z = []
-    z_mean = []
-
-    for i in range(len(latent_dims)):
-      eps_i = tf.random.normal([train_size, latent_dims[i]])
-      if i == 0:
-        z_mean_i = tf.zeros_like(eps_i)
-        z_i = eps_i * sigma_z[i]
-      else:
-        A_i = (tf.random.normal([latent_dims[i], latent_dims[i - 1]]))
-        z_i = tf.linalg.matvec(A_i, z_i) + eps_i * sigma_z[i]
-        z_mean_i = tf.linalg.matvec(A_i, z_mean_i)
-        As.append(A_i)
-      z.append(z_i)
-      z_mean.append(z_mean_i)
-      if i < len(latent_dims)-1 :
-        W.append(tf.zeros([data_dim,latent_dims[i]]))
-      else:
-        W.append(W_L)
-    z = tf.concat(z, -1)
-    z_mean = tf.concat(z_mean, -1)
-    W = tf.concat(W, -1)
-
-    x = tf.linalg.matvec(W, z) + sigma_data * tf.random.normal([train_size, data_dim])
-    x_mean = tf.linalg.matvec(W, z_mean)
-    # assert(len(latent_dims)==2)
-    Lambda0 = tf.linalg.diag(sigma_z[0]**2 * tf.ones([latent_dims[0]]))
-    z_cov = Lambda0
-
-
-    # z_cov = tf.concat(
-    #   [tf.concat([Lambda0, tf.matmul(As[0], Lambda0)], 0),
-    #    tf.concat([tf.matmul(Lambda0, As[0],  adjoint_b=True),
-    #               sigma_z[1]**2 * tf.ones([latent_dims[1]])+ tf.matmul(As[0], tf.matmul(Lambda0, As[0], adjoint_b=True))
-    #               ], 0)], 1)
-
-    x_cov = tf.matmul(W, tf.matmul(z_cov, W, adjoint_b=True)) + sigma_data**2 * tf.eye(data_dim)
-    x_llh_true = tf.reduce_mean(tfd.MultivariateNormalFullCovariance(loc = x_mean, covariance_matrix = x_cov).log_prob(x))
-
-
-  if FLAGS.data == 'simulation_':
     #simulate data
     data_dim = 10
     train_size = 1000

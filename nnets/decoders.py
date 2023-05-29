@@ -33,3 +33,6 @@ def cnn_decoder(latent_dim):
                 filters=1, kernel_size=3, strides=1, padding='same'),
         ]
     )
+
+
+
